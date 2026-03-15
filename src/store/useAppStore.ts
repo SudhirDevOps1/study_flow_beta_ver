@@ -132,7 +132,7 @@ function clampElapsedSeconds(session: StudySession | undefined, elapsedSeconds: 
   return Math.max(0, Math.min(elapsedSeconds, hardCap));
 }
 
-export const useAppStore = create<AppState>()((set, get) => ({
+export const useAppStore = create<AppState>()((set: any, get: any) => ({
   subjects: [],
   sessions: [],
   timer: defaultTimer,
@@ -549,6 +549,35 @@ export const useAppStore = create<AppState>()((set, get) => ({
     const approvedDeltaMs = Math.max(0, cutoffMs - timer.startedAtMs);
 
     return clampElapsedSeconds(activeSession, timer.accumulatedSeconds + Math.floor(approvedDeltaMs / 1000));
+  },
+
+  syncActiveSession: async (nowMs?: number) => {
+    const timer = get().timer;
+    if (!timer.activeSessionId) return;
+    
+    const activeSession = get().sessions.find((s: StudySession) => s.id === timer.activeSessionId);
+    if (!activeSession) return;
+
+    if (timer.isPaused || !timer.startedAtMs) return;
+
+    const currentMs = nowMs ?? Date.now();
+    const elapsed = get().getActiveElapsed(currentMs);
+    const clampedElapsed = clampElapsedSeconds(activeSession, elapsed);
+
+    await db.sessions.update(timer.activeSessionId, { 
+      actualSeconds: clampedElapsed,
+      updatedAt: new Date().toISOString()
+    });
+    
+    set((state: AppState) => {
+      const newSessions: StudySession[] = state.sessions.map((session: StudySession) =>
+        session.id === timer.activeSessionId ? { ...session, actualSeconds: clampedElapsed, updatedAt: new Date().toISOString() } : session
+      );
+      return {
+        sessions: sortSessions(newSessions),
+        ...calculateGamificationStats(newSessions)
+      };
+    });
   },
 
   setPomodoroMode: (enabled: boolean) => {
