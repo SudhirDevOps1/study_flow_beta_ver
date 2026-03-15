@@ -68,14 +68,14 @@ export function AnalyticsPage() {
 
   // Week comparison
   const weekComparison = streakData.currentWeekHours - streakData.lastWeekHours;
-  const weekComparisonPct = streakData.lastWeekHours > 0 
-    ? ((weekComparison / streakData.lastWeekHours) * 100).toFixed(0) 
+  const weekComparisonPct = streakData.lastWeekHours > 0
+    ? ((weekComparison / streakData.lastWeekHours) * 100).toFixed(0)
     : "∞";
 
   // Month comparison
   const monthComparison = streakData.currentMonthHours - streakData.lastMonthHours;
-  const monthComparisonPct = streakData.lastMonthHours > 0 
-    ? ((monthComparison / streakData.lastMonthHours) * 100).toFixed(0) 
+  const monthComparisonPct = streakData.lastMonthHours > 0
+    ? ((monthComparison / streakData.lastMonthHours) * 100).toFixed(0)
     : "∞";
 
   return (
@@ -108,11 +108,10 @@ export function AnalyticsPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setRange(item.key)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                range === item.key 
-                  ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30" 
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${range === item.key
+                  ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30"
                   : "bg-white/5 text-slate-300 hover:bg-white/10"
-              }`}
+                }`}
             >
               <span className="mr-2">{item.icon}</span>
               {item.label}
@@ -125,11 +124,11 @@ export function AnalyticsPage() {
         {/* Left Column: Charts and Heatmap */}
         <div className="lg:col-span-2 space-y-5">
           <AnalyticsCharts data={data} />
-          
+
           <Panel>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Yearly Activity Heatmap</h3>
-              <select 
+              <select
                 value={selectedYear}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(Number(e.target.value))}
                 className="bg-white/5 border border-white/10 rounded-lg px-3 py-1 text-sm text-white"
@@ -139,22 +138,21 @@ export function AnalyticsPage() {
                 ))}
               </select>
             </div>
-            
+
             <div className="overflow-x-auto pb-2">
               <div className="min-w-[700px]">
                 {/* Heatmap implementation... (omitted for brevity in replacement) */}
                 <div className="grid grid-cols-[repeat(53,1fr)] gap-1">
-                  {yearHeatmap.map((day: any, i: number) => (
-                    <div 
+                  {yearHeatmap.map((day: { day: string; minutes: number }, i: number) => (
+                    <div
                       key={i}
                       title={`${format(new Date(day.day), 'MMM d, yyyy')}: ${Math.round(day.minutes)} mins`}
-                      className={`aspect-square rounded-[2px] ${
-                        day.minutes === 0 ? 'bg-white/5' :
-                        day.minutes < 60 ? 'bg-cyan-900' :
-                        day.minutes < 120 ? 'bg-cyan-700' :
-                        day.minutes < 240 ? 'bg-cyan-500' :
-                        'bg-cyan-300'
-                      }`}
+                      className={`aspect-square rounded-[2px] ${day.minutes === 0 ? 'bg-white/5' :
+                          day.minutes < 60 ? 'bg-cyan-900' :
+                            day.minutes < 120 ? 'bg-cyan-700' :
+                              day.minutes < 240 ? 'bg-cyan-500' :
+                                'bg-cyan-300'
+                        }`}
                     />
                   ))}
                 </div>
@@ -166,7 +164,7 @@ export function AnalyticsPage() {
         {/* Right Column: Insights & Summaries */}
         <div className="space-y-5">
           <InsightsBlock />
-          
+
           {/* Quick Stats */}
           <Panel>
             <h3 className="text-lg font-semibold text-white mb-4">Quick Stats</h3>
@@ -313,7 +311,7 @@ export function AnalyticsPage() {
           </div>
           <select
             value={selectedYear}
-            onChange={(e: any) => setSelectedYear(Number(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedYear(Number(e.target.value))}
             className="rounded-xl border border-white/10 bg-slate-900/70 px-4 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none"
           >
             {availableYears.map((year: number) => (
@@ -321,7 +319,7 @@ export function AnalyticsPage() {
             ))}
           </select>
         </div>
-        
+
         <div className="overflow-x-auto">
           <div className="min-w-[800px]">
             {/* Month labels */}
@@ -331,7 +329,7 @@ export function AnalyticsPage() {
                 <div key={month} className="flex-1 text-center text-xs text-slate-400">{month}</div>
               ))}
             </div>
-            
+
             {/* Heatmap grid - 7 rows (days of week) x 53 cols (weeks) */}
             <div className="flex flex-col gap-0.5">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, dayIndex) => (
@@ -339,7 +337,7 @@ export function AnalyticsPage() {
                   <span className="w-8 text-xs text-slate-500">{day}</span>
                   <div className="flex flex-1 gap-0.5">
                     {yearHeatmap
-                      .filter((_: any, i: number) => new Date(yearHeatmap[i].day).getDay() === dayIndex)
+                      .filter((_: { day: string; minutes: number }, i: number) => new Date(yearHeatmap[i].day).getDay() === dayIndex)
                       .map((item: { day: string, minutes: number }, i: number) => (
                         <motion.div
                           key={item.day}
@@ -349,8 +347,8 @@ export function AnalyticsPage() {
                           title={`${format(new Date(item.day), "MMM d, yyyy")}: ${toDurationLabel(item.minutes)}`}
                           className="aspect-square flex-1 rounded-sm transition-transform hover:scale-150 hover:z-10"
                           style={{
-                            backgroundColor: item.minutes === 0 
-                              ? "rgba(148,163,184,0.1)" 
+                            backgroundColor: item.minutes === 0
+                              ? "rgba(148,163,184,0.1)"
                               : `rgba(34, 211, 238, ${Math.min(1, item.minutes / 180)})`,
                             maxWidth: "16px",
                           }}
@@ -381,10 +379,10 @@ export function AnalyticsPage() {
       <Panel>
         <h3 className="mb-4 text-lg font-semibold text-white">📚 Subject Breakdown</h3>
         <div className="space-y-3">
-          {subjectStats.map((subject: any, i: number) => {
-            const maxHours = Math.max(...subjectStats.map((s: any) => s.totalHours), 1);
+          {subjectStats.map((subject: Subject & { totalHours: number; sessionCount: number; completion: number }, i: number) => {
+            const maxHours = Math.max(...subjectStats.map((s: Subject & { totalHours: number }) => s.totalHours), 1);
             const barWidth = (subject.totalHours / maxHours) * 100;
-            
+
             return (
               <motion.div
                 key={subject.id}
@@ -395,7 +393,7 @@ export function AnalyticsPage() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <div 
+                    <div
                       className="h-4 w-4 rounded-full"
                       style={{ backgroundColor: subject.color }}
                     />
@@ -422,7 +420,7 @@ export function AnalyticsPage() {
               </motion.div>
             );
           })}
-          
+
           {subjectStats.length === 0 && (
             <div className="rounded-xl bg-white/5 p-6 text-center">
               <p className="text-3xl">📚</p>
